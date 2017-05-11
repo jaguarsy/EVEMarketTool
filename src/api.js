@@ -6,6 +6,11 @@ const request = require('request');
 const URL = 'https://www.ceve-market.org/query/?search=';
 //const IMAGE_URL = 'https://images.ceve-market.org/Types/4311_64.png';
 
+const order = (list, keyword) => {
+  for(let i = 0, len=list.length;i<len;i++){
+  }
+};
+
 module.exports = {
   query({ keyword, regionId }) {
     return new Promise((resolve, reject) => {

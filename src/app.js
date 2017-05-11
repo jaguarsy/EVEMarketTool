@@ -99,6 +99,9 @@ $form.addEventListener('submit', (event) => {
 
 clipboardWatcher({
   onTextChange(text) {
+    if(text) {
+      text = text.trim();
+    }
     $keyword.value = text;
     search();
   }

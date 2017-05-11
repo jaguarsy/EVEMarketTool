@@ -22,7 +22,7 @@ function createWindow() {
     frame: false,
     transparent: true,
     skipTaskbar: true,
-    backgroundColor: '#40000000',
+    backgroundColor: '#80111111',
   });
 
   // and load the index.html of the app.
