@@ -6,6 +6,26 @@ const api = require('./api');
 const electron = require('electron');
 const clipboard = electron.clipboard;
 
+NodeList.prototype.show = function () {
+  Array.prototype.forEach.call(this, (node) => {
+    node.show();
+  });
+};
+
+NodeList.prototype.hide = function () {
+  Array.prototype.forEach.call(this, (node) => {
+    node.hide();
+  });
+};
+
+HTMLElement.prototype.show = function () {
+  this.classList.remove('hide');
+};
+
+HTMLElement.prototype.hide = function () {
+  this.classList.add('hide');
+};
+
 const clipboardWatcher = (opts = { delay: 1000 }) => {
   let lastText = clipboard.readText();
   setInterval(() => {
@@ -26,14 +46,22 @@ const $region = $('#region');
 const $keyword = $('#keyword');
 const $form = $('#form');
 const $loading = $('#loading');
+const $toggles = document.querySelectorAll('.toggle');
 
 const postData = {};
+
+const format = (number) => {
+  if (typeof number === 'number') {
+    return number.toLocaleString('en-US');
+  }
+  return '';
+};
 
 const getItemHtml = (item) => {
   const result = ['<div class="item">'];
   result.push(`<p>名称: <strong>${item.typename}</strong></p>`);
-  result.push(`<p>求购出价: <strong>${item.buy}</p></strong>`);
-  result.push(`<p>卖方出价: <strong>${item.sell}</strong></p>`);
+  result.push(`<p>求购出价: <strong>${format(item.buy)}</p></strong>`);
+  result.push(`<p>卖方出价: <strong>${format(item.sell)}</strong></p>`);
   if (item.time) {
     result.push(`<p>时间: <strong>${item.time}</strong></p>`);
   }
@@ -47,16 +75,16 @@ const render = (list) => {
 
 const search = () => {
   $container.innerHTML = '';
-  $loading.style.display = 'block';
 
   postData.keyword = $keyword.value;
   if (!postData.keyword) {
     return;
   }
 
+  $loading.show();
   postData.regionId = $region.value;
   api.query(postData).then(render).then(() => {
-    $loading.style.display = 'none';
+    $loading.hide();
   });
 };
 
