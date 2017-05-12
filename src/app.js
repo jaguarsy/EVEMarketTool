@@ -62,7 +62,12 @@ const searchContract = (list) => {
     });
 };
 
+const regionId = localStorage.getItem('region');
+if (regionId) {
+  $region.value = regionId;
+}
 $region.addEventListener('change', () => {
+  localStorage.setItem('region', $region.value);
   search();
 });
 
