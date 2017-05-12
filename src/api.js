@@ -32,7 +32,7 @@ const queryOne = ({ keyword, regionId }) => {
       return target;
     }
 
-    return list[0];
+    return list[0] || { typename: keyword };
   });
 };
 
@@ -42,6 +42,16 @@ const multiQuery = (list) => {
       keyword: item.name,
       regionId: '10000002',
     }).then(result => {
+      if (result.typename !== item.name) {
+        return {
+          name: item.name,
+          price: null,
+          time: result.time,
+          count: item.count,
+          sumPrice: null,
+        };
+      }
+
       return {
         name: result.typename,
         price: result.sell,

@@ -15,6 +15,7 @@ const $region = $('#region');
 const $keyword = $('#keyword');
 const $form = $('#form');
 const $loading = $('#loading');
+const $warning = $('#warning');
 
 const renderList = (list, type = 1) => {
   $list.innerHTML = list
@@ -25,6 +26,7 @@ const renderList = (list, type = 1) => {
 const reset = () => {
   $list.innerHTML = '';
   $title.hide();
+  $warning.hide();
 };
 
 const search = () => {
@@ -50,15 +52,26 @@ const searchContract = (list) => {
     return;
   }
 
+  $loading.show();
   api.multiQuery(list)
     .then(result => {
+      let isNotComplete = false
       const sumPrice = result.reduce((result, item) => {
-        return result + item.sumPrice;
+        if (!item.sumPrice) {
+          isNotComplete = true;
+        }
+        return result + (item.sumPrice || 0);
       }, 0);
+      if (isNotComplete) {
+        $warning.show();
+      }
 
       $title.show();
       new CountUp('sumMoney', 0, sumPrice, 2, 0.5).start();
       renderList(result, 2);
+    })
+    .then(() => {
+      $loading.hide();
     });
 };
 
