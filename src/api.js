@@ -49,6 +49,7 @@ const multiQuery = (list) => {
           time: result.time,
           count: item.count,
           sumPrice: null,
+          description: result.description,
         };
       }
 
@@ -58,6 +59,7 @@ const multiQuery = (list) => {
         time: result.time,
         count: item.count,
         sumPrice: result.sell * item.count,
+        description: result.description,
       }
     });
   });
