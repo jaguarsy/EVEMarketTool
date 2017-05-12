@@ -1,0 +1,165 @@
+html, body {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  overflow-y: auto;
+  color: #ccc;
+  font-size: 12px;
+  /*background: rgba(0, 0, 0, 0.4);*/
+  font-family: "lucida grande", "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+}
+
+.title-bar {
+  position: fixed;
+  width: 100%;
+  color: #aaa;
+  font-size: 12px;
+  height: 20px;
+  line-height: 20px;
+  padding: 0 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  -webkit-app-region: drag;
+}
+
+.form-control {
+  -webkit-app-region: no-drag;
+  border: none;
+  color: #fff;
+  background: transparent;
+  outline: none;
+  padding: 0 6px;
+}
+
+select.form-control {
+  -webkit-appearance: none;
+}
+
+.container {
+  padding: 20px 8px 4px 8px;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.list .item:not(:last-child) {
+  border-bottom: solid 1px #888;
+}
+
+.container h3 {
+  margin: 2px 0;
+}
+
+.container h3,
+.item strong {
+  color: #eee;
+}
+
+.title {
+  border-bottom: solid 1px #ddd;
+}
+
+.container p {
+  margin: 2px 0;
+}
+
+.form {
+  display: inline-block;
+}
+
+.text-success {
+  color: #4a8050;
+}
+
+.text-danger {
+  color: #a73142;
+}
+
+.hide {
+  display: none;
+}
+
+/* loading */
+.cssload-container {
+  width: 100%;
+  height: 27px;
+  text-align: center;
+}
+
+.cssload-speeding-wheel {
+  width: 27px;
+  height: 27px;
+  margin: 0 auto;
+  border: 2px solid rgb(255, 255, 255);
+  border-radius: 50%;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  animation: cssload-spin 575ms infinite linear;
+  -o-animation: cssload-spin 575ms infinite linear;
+  -ms-animation: cssload-spin 575ms infinite linear;
+  -webkit-animation: cssload-spin 575ms infinite linear;
+  -moz-animation: cssload-spin 575ms infinite linear;
+}
+
+@keyframes cssload-spin {
+  100% {
+    transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@-o-keyframes cssload-spin {
+  100% {
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@-ms-keyframes cssload-spin {
+  100% {
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes cssload-spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@-moz-keyframes cssload-spin {
+  100% {
+    -moz-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+/* Let's get this party started */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.cssload-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+}

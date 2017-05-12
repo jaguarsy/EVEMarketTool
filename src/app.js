@@ -2,90 +2,64 @@
  * Created by johnnycage on 2017/5/11.
  */
 
+const CountUp = require('countup.js/dist/countUp.min');
 const api = require('./api');
-const electron = require('electron');
-const clipboard = electron.clipboard;
+const $ = require('./lib/domQuery');
+const textAnalyzer = require('./lib/textAnalyzer');
+const clipWatcher = require('./lib/clipWatcher');
+const tplCreator = require('./tplCreator');
 
-NodeList.prototype.show = function () {
-  Array.prototype.forEach.call(this, (node) => {
-    node.show();
-  });
-};
-
-NodeList.prototype.hide = function () {
-  Array.prototype.forEach.call(this, (node) => {
-    node.hide();
-  });
-};
-
-HTMLElement.prototype.show = function () {
-  this.classList.remove('hide');
-};
-
-HTMLElement.prototype.hide = function () {
-  this.classList.add('hide');
-};
-
-const clipboardWatcher = (opts = { delay: 1000 }) => {
-  let lastText = clipboard.readText();
-  setInterval(() => {
-    const text = clipboard.readText();
-    if (opts.onTextChange && (text && lastText !== text)) {
-      lastText = text;
-      return opts.onTextChange(text);
-    }
-  }, opts.delay);
-};
-
-const $ = (selector) => {
-  return document.querySelector(selector);
-};
-
-const $container = $('#container');
+const $list = $('#list');
+const $title = $('#title');
 const $region = $('#region');
 const $keyword = $('#keyword');
 const $form = $('#form');
 const $loading = $('#loading');
-const $toggles = document.querySelectorAll('.toggle');
 
-const postData = {};
-
-const format = (number) => {
-  if (typeof number === 'number') {
-    return number.toLocaleString('en-US');
-  }
-  return '';
+const renderList = (list, type = 1) => {
+  $list.innerHTML = list
+    .map(item => tplCreator(type, item))
+    .join('');
 };
 
-const getItemHtml = (item) => {
-  const result = ['<div class="item">'];
-  result.push(`<p>名称: <strong>${item.typename}</strong></p>`);
-  result.push(`<p>求购出价: <strong>${format(item.buy)}</p></strong>`);
-  result.push(`<p>卖方出价: <strong>${format(item.sell)}</strong></p>`);
-  if (item.time) {
-    result.push(`<p>时间: <strong>${item.time}</strong></p>`);
-  }
-  result.push('</div>');
-  return result.join('');
-};
-
-const render = (list) => {
-  $container.innerHTML = list.map(getItemHtml).join('');
+const reset = () => {
+  $list.innerHTML = '';
+  $title.hide();
 };
 
 const search = () => {
-  $container.innerHTML = '';
+  reset();
 
-  postData.keyword = $keyword.value;
-  if (!postData.keyword) {
+  if (!$keyword.value) {
     return;
   }
 
   $loading.show();
-  postData.regionId = $region.value;
-  api.query(postData).then(render).then(() => {
+  api.query({
+    keyword: $keyword.value,
+    regionId: $region.value,
+  }).then(renderList).then(() => {
     $loading.hide();
   });
+};
+
+const searchContract = (list) => {
+  reset();
+
+  if (!list || !list.length) {
+    return;
+  }
+
+  api.multiQuery(list)
+    .then(result => {
+      const sumPrice = result.reduce((result, item) => {
+        return result + item.sumPrice;
+      }, 0);
+
+      $title.show();
+      new CountUp('sumMoney', 0, sumPrice, 2, 0.5).start();
+      renderList(result, 2);
+    });
 };
 
 $region.addEventListener('change', () => {
@@ -97,12 +71,16 @@ $form.addEventListener('submit', (event) => {
   search();
 });
 
-clipboardWatcher({
+clipWatcher({
   onTextChange(text) {
-    if(text) {
-      text = text.trim();
+    const result = textAnalyzer(text);
+    if (result.type === 1) {  // 普通物品
+      $keyword.value = result.value;
+      search();
+    } else if (result.type === 2) { // 合同货柜
+      $keyword.value = '';
+      $region.value = '10000002';
+      searchContract(result.value);
     }
-    $keyword.value = text;
-    search();
   }
 });

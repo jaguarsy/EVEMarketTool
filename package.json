@@ -12,6 +12,7 @@
     "electron": "~1.6.2"
   },
   "dependencies": {
+    "countup.js": "^1.8.5",
     "request": "^2.81.0"
   }
 }
