@@ -53,26 +53,26 @@ const searchContract = (list) => {
   }
 
   $loading.show();
-  api.multiQuery(list)
-    .then(result => {
-      let isNotComplete = false
-      const sumPrice = result.reduce((result, item) => {
-        if (!item.sumPrice) {
-          isNotComplete = true;
-        }
-        return result + (item.sumPrice || 0);
-      }, 0);
-      if (isNotComplete) {
-        $warning.show();
-      }
-
-      $title.show();
-      new CountUp('sumMoney', 0, sumPrice, 2, 0.5).start();
-      renderList(result, 2);
-    })
-    .then(() => {
-      $loading.hide();
+  const countUp = new CountUp('sumMoney', 0, 0, 2, 0.5);
+  countUp.start();
+  let allSumPrice = 0;
+  api.multiQuery(list, (item) => {
+    allSumPrice = allSumPrice + (item.sumPrice || 0);
+    countUp.update(allSumPrice);
+  }).then(result => {
+    let isNotComplete = result.some(item => {
+      return !item.sumPrice;
     });
+
+    if (isNotComplete) {
+      $warning.show();
+    }
+
+    $title.show();
+    renderList(result, 2);
+  }).then(() => {
+    $loading.hide();
+  });
 };
 
 const regionId = localStorage.getItem('region');

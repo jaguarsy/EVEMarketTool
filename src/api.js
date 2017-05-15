@@ -36,31 +36,39 @@ const queryOne = ({ keyword, regionId }) => {
   });
 };
 
-const multiQuery = (list) => {
+const multiQuery = (list, eachCallback) => {
   const promiseList = list.map(item => {
     return queryOne({
       keyword: item.name,
       regionId: '10000002',
-    }).then(result => {
-      if (result.typename !== item.name) {
-        return {
+    }).then(res => {
+      let result;
+
+      if (res.typename !== item.name) {
+        result = {
           name: item.name,
           price: null,
-          time: result.time,
+          time: res.time,
           count: item.count,
           sumPrice: null,
-          description: result.description,
+          description: res.description,
+        };
+      } else {
+        result = {
+          name: res.typename,
+          price: res.sell,
+          time: res.time,
+          count: item.count,
+          sumPrice: res.sell * item.count,
+          description: res.description,
         };
       }
 
-      return {
-        name: result.typename,
-        price: result.sell,
-        time: result.time,
-        count: item.count,
-        sumPrice: result.sell * item.count,
-        description: result.description,
+      if (typeof eachCallback === 'function') {
+        eachCallback(result);
       }
+
+      return result;
     });
   });
 
