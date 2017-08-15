@@ -12,7 +12,7 @@ request('https://eve-central.com/home/typesearch.html', (error, response, body) 
     var match;
     var result = [];
     while (match = re.exec(html)) {
-      if (match[2] && match[1]) {
+      if (match[2] && match[1] && match[2].indexOf('♦') < 0) {
         result.push({
           n: match[2].toLowerCase(),
           v: match[1],

@@ -12,12 +12,15 @@ const goods = require('../goods.json');
 const $list = $('#list');
 const $region = $('#region');
 const $keyword = $('#keyword');
-const $form = $('#form');
 
 const renderList = (list) => {
-  $list.innerHTML = list
-    .map(tplCreator)
-    .join('');
+  if (list.length) {
+    $list.innerHTML = list
+      .map(tplCreator)
+      .join('');
+  } else {
+    $list.innerHTML = '<p>没有找到相关的物品</p>';
+  }
 };
 
 const reset = () => {
@@ -56,9 +59,18 @@ $region.addEventListener('change', () => {
   search();
 });
 
-$form.addEventListener('submit', (event) => {
+let t;
+$keyword.addEventListener('input', (event) => {
   event.preventDefault();
-  search();
+  if (t) {
+    clearTimeout(t);
+  }
+
+  if ($keyword.value.trim().length > 2) {
+    t = setTimeout(() => {
+      search();
+    }, 500);
+  }
 });
 
 $list.addEventListener('click', (event) => {
@@ -74,8 +86,8 @@ $list.addEventListener('click', (event) => {
           console.log(price);
           target.hide();
           target.parentNode.parentNode.innerHTML +=
-            `<p>sell: ${moneyFormat(price.sell.max)}</p>` +
-            `<p>buy: ${moneyFormat(price.buy.min)}</p>`;
+            `<p>sell: ${moneyFormat(price.sell.min)}</p>` +
+            `<p>buy: ${moneyFormat(price.buy.max)}</p>`;
         } else {
           target.innerText = '[重新获取]';
         }
