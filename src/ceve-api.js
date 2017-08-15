@@ -4,7 +4,6 @@
 const request = require('request');
 
 const URL = 'https://www.ceve-market.org/query/?search=';
-//const IMAGE_URL = 'https://images.ceve-market.org/Types/4311_64.png';
 
 const orderByLength = list => list.sort((a, b) => a.typename.length - b.typename.length);
 

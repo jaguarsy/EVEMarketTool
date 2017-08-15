@@ -2,76 +2,47 @@
  * Created by johnnycage on 2017/5/11.
  */
 
-const CountUp = require('countup.js/dist/countUp.min');
-const api = require('./api');
+// const CountUp = require('countup.js/dist/countUp.min');
+const api = require('./eve-api');
 const $ = require('./lib/domQuery');
-const textAnalyzer = require('./lib/textAnalyzer');
-const clipWatcher = require('./lib/clipWatcher');
 const tplCreator = require('./tplCreator');
+const moneyFormat = require('./lib/moneyFormat');
+const goods = require('../goods.json');
 
 const $list = $('#list');
-const $title = $('#title');
 const $region = $('#region');
 const $keyword = $('#keyword');
 const $form = $('#form');
-const $loading = $('#loading');
-const $warning = $('#warning');
 
-const renderList = (list, type = 1) => {
+const renderList = (list) => {
   $list.innerHTML = list
-    .map(item => tplCreator(type, item))
+    .map(tplCreator)
     .join('');
 };
 
 const reset = () => {
   $list.innerHTML = '';
-  $title.hide();
-  $warning.hide();
 };
 
 const search = () => {
   reset();
 
-  if (!$keyword.value) {
+  const val = $keyword.value.trim().toLowerCase();
+
+  if (!val) {
     return;
   }
 
-  $loading.show();
-  api.query({
-    keyword: $keyword.value,
-    regionId: $region.value,
-  }).then(renderList).then(() => {
-    $loading.hide();
-  });
+  const result = goods
+    .filter(p => p.n.indexOf(val) > -1)
+    .sort((a, b) => a.n.length - b.n.length);
+  renderList(result);
 };
 
-const searchContract = (list) => {
-  reset();
-
-  if (!list || !list.length) {
-    return;
-  }
-
-  $loading.show();
-  const countUp = new CountUp('sumMoney', 0, 0, 2, 0.5);
-  countUp.start();
-  let allSumPrice = 0;
-  api.multiQuery(list, (item) => {
-    allSumPrice = allSumPrice + (item.sumPrice || 0);
-    countUp.update(allSumPrice);
-  }).then(result => {
-    let isNotComplete = result.some(item => {
-      return !item.sumPrice;
-    });
-
-    if (isNotComplete) {
-      $warning.show();
-    }
-
-    $title.show();
-    renderList(result, 2);
-  }).then(() => {
-    $loading.hide();
+const loadPrice = (typeId) => {
+  return api.query({
+    typeId,
+    regionId: $region.value,
   });
 };
 
@@ -79,6 +50,7 @@ const regionId = localStorage.getItem('region');
 if (regionId) {
   $region.value = regionId;
 }
+
 $region.addEventListener('change', () => {
   localStorage.setItem('region', $region.value);
   search();
@@ -89,16 +61,24 @@ $form.addEventListener('submit', (event) => {
   search();
 });
 
-clipWatcher({
-  onTextChange(text) {
-    const result = textAnalyzer(text);
-    if (result.type === 1) {  // 普通物品
-      $keyword.value = result.value;
-      search();
-    } else if (result.type === 2) { // 合同货柜
-      $keyword.value = '';
-      $region.value = '10000002';
-      searchContract(result.value);
-    }
+$list.addEventListener('click', (event) => {
+  const target = event.target;
+  const dataId = target.attributes['data-id'];
+  if (dataId && dataId.value) {
+    target.innerText = '[获取中...]';
+
+    loadPrice(dataId.value)
+      .then((result) => {
+        const price = result[0];
+        if (price) {
+          console.log(price);
+          target.hide();
+          target.parentNode.parentNode.innerHTML +=
+            `<p>sell: ${moneyFormat(price.sell.max)}</p>` +
+            `<p>buy: ${moneyFormat(price.buy.min)}</p>`;
+        } else {
+          target.innerText = '[重新获取]';
+        }
+      });
   }
 });
