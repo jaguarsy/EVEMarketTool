@@ -22,7 +22,14 @@ const query = ({ typeId, regionId }) => {
   });
 };
 
+const multiQuery = ({ typeIds, regionId }) => {
+  return query({
+    typeId: typeIds.join('&typeid='),
+    regionId,
+  });
+};
 
 module.exports = {
   query,
+  multiQuery,
 };
