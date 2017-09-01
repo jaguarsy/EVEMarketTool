@@ -5,15 +5,15 @@ const request = require('request');
 
 const URL = 'http://api.eve-central.com/api/marketstat/json?typeid=';
 
-const query = ({ typeId, regionId }) => {
+const query = ({ typeId, regionId, isSystem }) => {
   return new Promise((resolve, reject) => {
     request({
-      url: `${URL}${typeId}&regionlimit=${regionId}`,
+      url: `${URL}${typeId}&${isSystem ? 'usesystem' : 'regionlimit'}=${regionId}`,
       headers: {
         Host: 'api.eve-central.com',
       }
     }, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+      if (!error && response.statusCode === 200) {
         resolve(JSON.parse(body));
       } else {
         reject(error || body);

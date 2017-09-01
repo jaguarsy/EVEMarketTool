@@ -13,13 +13,12 @@ request('https://eve-central.com/home/typesearch.html', (error, response, body) 
     var result = [];
     while (match = re.exec(html)) {
       if (match[2] && match[1] && match[2].indexOf('♦') < 0) {
-        result.push({
-          n: match[2].toLowerCase(),
-          v: match[1],
-        });
+        result.push(
+          match[2].toLowerCase() + '=' + match[1]
+        );
       }
     }
-    fs.writeFileSync('../goods.json', JSON.stringify(result));
+    fs.writeFileSync('./goods.json', JSON.stringify(result.join(';')));
   }
 });
 

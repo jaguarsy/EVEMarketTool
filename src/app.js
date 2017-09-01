@@ -61,9 +61,12 @@ const search = () => {
 };
 
 const loadPrice = (typeId) => {
+  const type = $region.selectedOptions[0].getAttribute('data-type');
+
   return api.query({
     typeId,
     regionId: $region.value,
+    isSystem: type === 'system',
   });
 };
 
@@ -140,11 +143,11 @@ $keyword.addEventListener('input', (event) => {
 
 $list.addEventListener('click', (event) => {
   const target = event.target;
-  const dataId = target.attributes['data-id'];
-  if (dataId && dataId.value) {
+  const dataId = target.getAttribute('data-id');
+  if (dataId) {
     target.innerText = '[获取中...]';
 
-    loadPrice(dataId.value)
+    loadPrice(dataId)
       .then((result) => {
         const price = result[0];
         if (price) {
